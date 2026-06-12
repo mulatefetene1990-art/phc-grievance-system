@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client Grievance Center</title>
+    <link rel="stylesheet" href="https://jsdelivr.net">
+</head>
+<body>
+    <header style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+        <h2>Patient Care Log Dashboard</h2>
+        <div>
+            <span>Account: <strong>{{ session['username'] }}</strong></span> | 
+            <a href="{{ url_for('logout') }}"><button style="padding: 5px 10px;">Log Out</button></a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}<div style="color: #4caf50; background: #e8f5e9; padding: 10px; margin: 15px 0; font-weight: bold;">✓ {{ messages[0] }}</div>{% endif %}
+    {% endwith %}
+
+    <section>
+        <h3>File a New Clinic Department Complaint</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Patient Full Legal Name</label>
+            <input type="text" name="patient_name" placeholder="SemenHC" required>
+
+            <label>Primary Care Facility Clinic Location</label>
+            <input type="text" name="facility_name" placeholder="Community Health Center" required>
+
+            <label>Department Where Incident Occurred</label>
+            <select name="department" required>
+                <option value="OPD (Outpatient Department)">OPD (Outpatient Department)</option>
+                <option value="Emergency Room">Emergency Room</option>
+                <option value="Pharmacy / Dispensary">Pharmacy / Dispensary</option>
+                <option value="Laboratory Services">Laboratory Services</option>
+                <option value="Radiology / Imaging">Radiology / Imaging</option>
+                <option value="Inpatient Ward">Inpatient Ward</option>
+                <option value="Billing & Reception">Billing & Reception</option>
+            </select>
+
+            <label>Grievance Nature Classification</label>
+            <select name="category" required>
+                <option value="Long Waiting Times">Long Waiting Times: የአገልግሎት መዘግየት</option>
+                <option value="Staff Misbehavior">Staff Behavior & Professionalism: የሰራተኞች ባህሪ እና ሙያዊ ብቃት</option>
+                <option value="Facility Cleanliness">Sanitation & Hygiene Concerns: የንጽህና መጓደል</option>
+                <option value="Medical Assessment Error">Medical Diagnostic/Prescription Dispute: የመድኃኒት ዓይነት እና መጠን አለመግባባት</option>
+                <option value="Shortage of Supplies">Medication/Equipment Stock Out: የመድኃኒት ወይም የሕክምና መሣሪያዎች እጥረት</option>
+            </select>
+
+            <label>Detailed Incident Breakdown Narrative</label>
+            <textarea name="description" rows="4" placeholder="Document specific dates, times, or context details..." required></textarea>
+
+            <label>Attach Evidence Verification Image (Optional)</label>
+            <input type="file" name="evidence_image" accept="image/*">
+
+            <button type="submit">Log Official System Grievance</button>
+        </form>
+    </section>
+
+    <hr>
+
+    <section>
+        <h3>Your Grievance Log History Pipeline</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Case Ref</th>
+                    <th>Clinic & Department Location</th>
+                    <th>Category</th>
+                    <th>Evidence Image</th>
+                    <th>Status Tracker</th>
+                    <th>Administrative Resolution Assessment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in grievances %}
+                <tr>
+                    <td>#{{ g.id }}</td>
+                    <td>
+                        <strong>{{ g.facility_name }}</strong><br>
+                        <small style="color: #2196f3;">📍 {{ g.department }}</small>
+                    </td>
+                    <td><mark>{{ g.category }}</mark></td>
+                    <td>
+                        {% if g.image_filename %}
+                            <a href="{{ url_for('static', filename='uploads/' + g.image_filename) }}" target="_blank">🔗 View File</a>
+                        {% else %}
+                            <span style="color:#999;">No data image</span>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ g.status }}</strong></td>
+                    <td>{{ g.admin_remarks if g.admin_remarks else 'Awaiting review queue tracking assignment.' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrative Infrastructure Dashboard</title>
+    <link rel="stylesheet" href="https://jsdelivr.net">
+</head>
+<body style="max-width: 95%;">
+    <header style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+        <h2>Administrative Quality Control Operations Command</h2>
+        <div>
+            <span>Operator: <strong style="color:#2196f3;">{{ session['username'] }} (Admin Officer)</strong></span> | 
+            <a href="{{ url_for('logout') }}"><button style="padding: 5px 10px;">Log Out</button></a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}<div style="color: #2196f3; background: #e3f2fd; padding: 10px; margin: 15px 0; font-weight: bold;">i {{ messages[0] }}</div>{% endif %}
+    {% endwith %}
+
+    <h3>Active Case System Infrastructure</h3>
+    <table style="width: 100%;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient Details</th>
+                <th>Facility Infrastructure Vectors</th>
+                <th>Description Narrative</th>
+                <th style="width: 170px;">Evidence Image Data</th>
+                <th>Current Status</th>
+                <th>Incident Assessment Controls</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in grievances %}
+            <tr style="vertical-align: top;">
+                <td><strong>#{{ g.id }}</strong></td>
+                <td>{{ g.patient_name }}</td>
+                <td>
+                    <strong>{{ g.facility_name }}</strong><br>
+                    <small style="background:#e3f2fd; color:#0d47a1; padding:2px 4px; border-radius:3px; display:inline-block; margin-bottom:3px;">📍 Dept: {{ g.department }}</small><br>
+                    <small style="background:#eee; padding:2px 4px; border-radius:3px; display:inline-block;">⚠️ Issue: {{ g.category }}</small>
+                </td>
+                <td><p style="font-size: 0.9em; max-height: 120px; overflow-y: auto;">{{ g.description }}</p></td>
+                <td>
+                    {% if g.image_filename %}
+                        <a href="{{ url_for('static', filename='uploads/' + g.image_filename) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='uploads/' + g.image_filename) }}" alt="Evidence Details" style="max-width: 140px; border: 1px solid #ddd; border-radius: 4px; display: block; margin-bottom: 5px;">
+                            <small>Open Full Size ↗</small>
+                        </a>
+                    {% else %}
+                        <span style="color: #aaa; font-style: italic;">No verification data.</span>
+                    {% endif %}
+                </td>
+                <td><strong>{{ g.status }}</strong></td>
+                <td>
+                    <form method="POST" style="margin: 0; padding: 6px; background: #f9f9f9; border: 1px solid #eaeaea;">
+                        <input type="hidden" name="grievance_id" value="{{ g.id }}">
+                        
+                        <label style="margin-top:0; font-size:0.85em;">Pipeline Status Routing</label>
+                        <select name="status" style="width:100%; margin-bottom: 8px;">
+                            <option value="Pending" {% if g.status == 'Pending' %}selected{% endif %}>Pending Review</option>
+                            <option value="Under Investigation" {% if g.status == 'Under Investigation' %}selected{% endif %}>Under Investigation</option>
+                            <option value="Resolved" {% if g.status == 'Resolved' %}selected{% endif %}>Case Resolved</option>
+                        </select>
+                        
+                        <label style="font-size:0.85em;">Resolution & Action Taken Logs</label>
+                        <input type="text" name="remarks" value="{{ g.admin_remarks }}" placeholder="Log specific actions or actions taken..." required style="width:100%; margin-bottom: 8px;">
+                        
+                        <button type="submit" style="width:100%; background-color:#2196f3; color:white; border:none;">Commit Structural Changes</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
